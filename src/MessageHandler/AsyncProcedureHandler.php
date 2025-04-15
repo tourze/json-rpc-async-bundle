@@ -5,17 +5,17 @@ namespace Tourze\JsonRPCAsyncBundle\MessageHandler;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Tourze\JsonRPC\Core\Contracts\EndpointInterface;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
-use Tourze\JsonRPCTurboBundle\Service\JsonRpcEndpoint as SDKJsonRpcEndpoint;
 use Yiisoft\Json\Json;
 
 #[AsMessageHandler]
 class AsyncProcedureHandler
 {
     public function __construct(
-        private readonly SDKJsonRpcEndpoint $sdkEndpoint,
+        private readonly EndpointInterface $sdkEndpoint,
         private readonly AsyncResultRepository $resultRepository,
         private readonly CacheInterface $cache,
         private readonly LoggerInterface $logger,
