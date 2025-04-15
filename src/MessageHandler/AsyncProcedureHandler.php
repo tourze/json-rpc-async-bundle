@@ -9,7 +9,6 @@ use Tourze\JsonRPC\Core\Contracts\EndpointInterface;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
-use Yiisoft\Json\Json;
 
 #[AsMessageHandler]
 class AsyncProcedureHandler
@@ -26,7 +25,7 @@ class AsyncProcedureHandler
     {
         $payload = $message->getPayload();
         $content = $this->sdkEndpoint->index($payload);
-        $content = Json::decode($content);
+        $content = json_decode($content, true);
 
         try {
             // 先把结果写缓存，以更早地读取到
