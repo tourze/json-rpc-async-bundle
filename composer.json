@@ -14,7 +14,7 @@
     "symfony/http-kernel": "^6.4",
     "symfony/framework-bundle": "^6.4",
     "symfony/cache-contracts": "^3",
-    "tourze/json-rpc-core": ">=0.0.6",
+    "tourze/json-rpc-core": "^0.0.6",
     "tourze/doctrine-helper": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.0.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
