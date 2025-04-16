@@ -1,0 +1,37 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'autonumber
+'Client -> Application: 发送 JSONRPC Payload
+'Application -> JsonRPC_Endpoint: 转发
+'JsonRPC_Endpoint -> 方法类: 转发
+'
+' -> JsonRPC_Endpoint: execute()返回array
+'JsonRPC_Endpoint -> Application: 序列化为JSON
+'Application --> Client: 响应 JSONRPC 结果
+
+autonumber
+Client -> JsonRPC_Endpoint: 发送 Payload（异步）
+JsonRPC_Endpoint -> 方法类: 执行
+方法类 -> Redis: 创建异步执行的Message
+方法类 -> JsonRPC_Endpoint: execute()返回异常-799，附带数据内容是{"taskId":"123-456-789"}
+JsonRPC_Endpoint --> Client: 序列化为JSON，响应JSONRPC结果
+
+Client -> JsonRPC_Endpoint: 发送 查询异步执行结果 Payload
+JsonRPC_Endpoint -> GetAsyncRequestResult: 查询结果
+GetAsyncRequestResult -> Cache: 查询缓存
+GetAsyncRequestResult -> JsonRPC_Endpoint: 没有结果，Throw Exception -789
+JsonRPC_Endpoint -> Client: 还没完成
+
+消息消费者 -> Redis: 读取异步消息
+Note right of 消息消费者: 同步执行方法类
+消息消费者 -> Cache: 执行结果写缓存
+
+Client -> JsonRPC_Endpoint: 发送 查询异步执行结果 Payload
+JsonRPC_Endpoint -> GetAsyncRequestResult: 查询结果
+GetAsyncRequestResult -> Cache: 查询缓存
+Cache -> GetAsyncRequestResult: 有结果
+GetAsyncRequestResult -> JsonRPC_Endpoint: 重新封装返回结果，结果不会是 -789错误 or -799错误
+JsonRPC_Endpoint -> Client: 已完成，返回具体JSON
+
+@enduml
