@@ -5,7 +5,6 @@ namespace Tourze\JsonRPCAsyncBundle\EventSubscriber;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Tourze\DoctrineHelper\ReflectionHelper;
-use Tourze\DoctrineSnowflakeBundle\Service\Snowflake;
 use Tourze\JsonRPC\Core\Contracts\RequestHandlerInterface;
 use Tourze\JsonRPC\Core\Event\MethodExecutingEvent;
 use Tourze\JsonRPC\Core\Exception\ApiException;
@@ -13,6 +12,7 @@ use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
 use Tourze\JsonRPC\Core\Model\JsonRpcResponse;
 use Tourze\JsonRPCAsyncBundle\Attribute\AsyncExecute;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
+use Tourze\SnowflakeBundle\Service\Snowflake;
 
 /**
  * 异步执行逻辑的处理

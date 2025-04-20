@@ -16,6 +16,7 @@
     "symfony/cache-contracts": "^3",
     "tourze/json-rpc-core": "^0.0.6",
     "tourze/doctrine-helper": "0.0.*",
+    "tourze/symfony-snowflake-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.0.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
