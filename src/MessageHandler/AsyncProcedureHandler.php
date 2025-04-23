@@ -2,20 +2,20 @@
 
 namespace Tourze\JsonRPCAsyncBundle\MessageHandler;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Tourze\JsonRPC\Core\Contracts\EndpointInterface;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
-use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 
 #[AsMessageHandler]
 class AsyncProcedureHandler
 {
     public function __construct(
         private readonly EndpointInterface $sdkEndpoint,
-        private readonly AsyncResultRepository $resultRepository,
+        private readonly EntityManagerInterface $entityManager,
         private readonly CacheInterface $cache,
         private readonly LoggerInterface $logger,
     ) {
@@ -40,6 +40,7 @@ class AsyncProcedureHandler
         $record = new AsyncResult();
         $record->setTaskId($message->getTaskId());
         $record->setResult($content);
-        $this->resultRepository->save($record);
+        $this->entityManager->persist($record);
+        $this->entityManager->flush();
     }
 }
