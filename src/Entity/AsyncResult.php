@@ -13,7 +13,7 @@ use Tourze\ScheduleEntityCleanBundle\Attribute\AsScheduleClean;
 /**
  * jsonRpc 异步执行结果
  */
-#[AsScheduleClean(expression: '22 */6 * * *', defaultKeepDay: 1, keepDayEnv: 'ASYNC_RESULT_PERSIST_DAY_NUM')]
+#[AsScheduleClean(expression: '30 5 * * *', defaultKeepDay: 1, keepDayEnv: 'ASYNC_RESULT_PERSIST_DAY_NUM')]
 #[ORM\Entity(repositoryClass: AsyncResultRepository::class)]
 #[ORM\Table(name: 'async_json_rpc_result', options: ['comment' => 'jsonRpc 异步执行结果'])]
 class AsyncResult

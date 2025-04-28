@@ -11,6 +11,7 @@ use Tourze\JsonRPC\Core\Exception\JsonRpcException;
 use Tourze\JsonRPC\Core\Model\JsonRpcResponse;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
+use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 use Tourze\JsonRPCEndpointBundle\Serialization\JsonRpcResponseNormalizer;
 
 #[AsMessageHandler]
@@ -22,11 +23,24 @@ class AsyncProcedureHandler
         private readonly CacheInterface $cache,
         private readonly LoggerInterface $logger,
         private readonly JsonRpcResponseNormalizer $responseNormalizer,
+        private readonly AsyncResultRepository $resultRepository,
     ) {
     }
 
     public function __invoke(AsyncProcedureMessage $message): void
     {
+        // 如果已经能查到结果，那么不要重复执行
+        $record = $this->resultRepository->findOneBy([
+            'taskId' => $message->getTaskId(),
+        ]);
+        if ($record) {
+            $this->logger->warning('异步JSON-RPC任务已执行过，不允许重复执行', [
+                'taskId' => $message->getTaskId(),
+                'payload' => $message->getPayload(),
+            ]);
+            return;
+        }
+
         $payload = $message->getPayload();
 
         try {
@@ -35,6 +49,7 @@ class AsyncProcedureHandler
         } catch (\Throwable $exception) {
             $this->logger->error('异步执行时发生未知异常', [
                 'taskId' => $message->getTaskId(),
+                'payload' => $message->getPayload(),
                 'exception' => $exception,
             ]);
 
