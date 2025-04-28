@@ -22,6 +22,7 @@
     "tourze/doctrine-snowflake-bundle": "0.0.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
+    "tourze/json-rpc-endpoint-bundle": "0.0.*",
     "tourze/symfony-async-bundle": "0.0.*",
     "tourze/symfony-schedule-entity-clean-bundle": "0.0.*",
     "psr/log": "^3|^2|^1",
