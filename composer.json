@@ -19,7 +19,7 @@
     "tourze/json-rpc-core": "^0.0.6",
     "tourze/doctrine-helper": "0.0.*",
     "tourze/symfony-snowflake-bundle": "0.0.*",
-    "tourze/doctrine-snowflake-bundle": "0.0.*",
+    "tourze/doctrine-snowflake-bundle": "0.1.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/json-rpc-endpoint-bundle": "0.0.*",
