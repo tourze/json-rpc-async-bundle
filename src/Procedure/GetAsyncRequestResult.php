@@ -2,6 +2,7 @@
 
 namespace Tourze\JsonRPCAsyncBundle\Procedure;
 
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -15,6 +16,7 @@ use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 
 #[MethodDoc('获取异步任务结果')]
 #[MethodExpose('GetAsyncRequestResult')]
+#[WithMonologChannel('procedure')]
 class GetAsyncRequestResult extends BaseProcedure
 {
     #[MethodParam('taskId')]
@@ -22,7 +24,7 @@ class GetAsyncRequestResult extends BaseProcedure
 
     public function __construct(
         private readonly AsyncResultRepository $resultRepository,
-        private readonly LoggerInterface $procedureLogger,
+        private readonly LoggerInterface $logger,
         private readonly CacheInterface $cache,
     ) {
     }
@@ -34,7 +36,7 @@ class GetAsyncRequestResult extends BaseProcedure
             /** @var CacheItem $cache */
             $cache = $this->cache->getItem(AsyncResult::CACHE_PREFIX . $this->taskId);
         } catch (\Throwable $exception) {
-            $this->procedureLogger->error('从缓存中读取异步结果失败', [
+            $this->logger->error('从缓存中读取异步结果失败', [
                 'exception' => $exception,
             ]);
         }
