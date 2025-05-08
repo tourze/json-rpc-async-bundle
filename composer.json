@@ -25,8 +25,9 @@
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/json-rpc-core": "^0.0.6",
     "tourze/json-rpc-endpoint-bundle": "0.1.*",
+    "tourze/symfony-async-bundle": "0.0.*",
     "tourze/symfony-schedule-entity-clean-bundle": "0.1.*",
-    "tourze/symfony-async-bundle": "0.0.*"
+    "tourze/symfony-snowflake-bundle": "0.0.*"
   },
   "require-dev": {
     "phpstan/phpstan": "^2.1",
