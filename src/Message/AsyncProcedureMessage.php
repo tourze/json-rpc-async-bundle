@@ -2,7 +2,7 @@
 
 namespace Tourze\JsonRPCAsyncBundle\Message;
 
-use Tourze\Symfony\Async\Message\AsyncMessageInterface;
+use Tourze\AsyncContracts\AsyncMessageInterface;
 
 class AsyncProcedureMessage implements AsyncMessageInterface
 {
