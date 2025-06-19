@@ -4,7 +4,6 @@ namespace Tourze\JsonRPCAsyncBundle\Procedure;
 
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Cache\CacheItem;
 use Symfony\Contracts\Cache\CacheInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
@@ -31,21 +30,25 @@ class GetAsyncRequestResult extends BaseProcedure
 
     public function execute(): array
     {
-        $cache = null;
+        $cacheKey = AsyncResult::CACHE_PREFIX . $this->taskId;
+        
+        $cachedResult = null;
         try {
-            /** @var CacheItem $cache */
-            $cache = $this->cache->getItem(AsyncResult::CACHE_PREFIX . $this->taskId);
+            $cachedResult = $this->cache->get($cacheKey, function () {
+                return null;
+            });
         } catch (\Throwable $exception) {
             $this->logger->error('从缓存中读取异步结果失败', [
                 'exception' => $exception,
             ]);
         }
-        if ($cache?->isHit()) {
-            return $this->handleResult($cache->get());
+        
+        if ($cachedResult !== null) {
+            return $this->handleResult($cachedResult);
         }
 
         $record = $this->resultRepository->findOneBy(['taskId' => $this->taskId]);
-        if (!$record) {
+        if ($record === null) {
             throw new ApiException('未执行完成', -789);
         }
 

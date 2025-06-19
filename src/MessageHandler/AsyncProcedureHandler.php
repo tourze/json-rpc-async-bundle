@@ -33,7 +33,7 @@ class AsyncProcedureHandler
         $record = $this->resultRepository->findOneBy([
             'taskId' => $message->getTaskId(),
         ]);
-        if ($record) {
+        if ($record !== null) {
             $this->logger->warning('异步JSON-RPC任务已执行过，不允许重复执行', [
                 'taskId' => $message->getTaskId(),
                 'payload' => $message->getPayload(),

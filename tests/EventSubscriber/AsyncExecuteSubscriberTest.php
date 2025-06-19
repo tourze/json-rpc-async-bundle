@@ -349,7 +349,7 @@ class AsyncExecuteSubscriberTest extends TestCase
 
         $this->messageBus->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function ($message) use ($taskId, $complexParams) {
+            ->with($this->callback(function ($message) use ($complexParams) {
                 if (!$message instanceof AsyncProcedureMessage) {
                     return false;
                 }

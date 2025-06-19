@@ -46,6 +46,9 @@ class AsyncResultTest extends TestCase
         $now = new \DateTime();
 
         $entity->setCreateTime($now);
-        $this->assertSame($now, $entity->getCreateTime());
+        $createTime = $entity->getCreateTime();
+        
+        $this->assertInstanceOf(\DateTimeImmutable::class, $createTime);
+        $this->assertEquals($now->format('Y-m-d H:i:s'), $createTime->format('Y-m-d H:i:s'));
     }
 }

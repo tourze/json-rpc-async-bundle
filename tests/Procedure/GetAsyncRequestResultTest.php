@@ -46,7 +46,26 @@ class TestCacheAdapter implements CacheInterface
     
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
-        return $this->items[$key] ?? $callback();
+        if (array_key_exists($key, $this->items)) {
+            return $this->items[$key];
+        }
+        
+        // 创建一个模拟的 ItemInterface
+        $item = new class($key) implements \Symfony\Contracts\Cache\ItemInterface {
+            public function __construct(private string $key) {}
+            public function getKey(): string { return $this->key; }
+            public function get(): mixed { return null; }
+            public function isHit(): bool { return false; }
+            public function set(mixed $value): static { return $this; }
+            public function expiresAt(?\DateTimeInterface $expiration): static { return $this; }
+            public function expiresAfter(\DateInterval|int|null $time): static { return $this; }
+            public function tag(string|iterable $tags): static { return $this; }
+            public function getMetadata(): array { return []; }
+        };
+        
+        $value = $callback($item, true);
+        $this->items[$key] = $value;
+        return $value;
     }
     
     public function delete(string $key): bool
@@ -164,6 +183,10 @@ class GetAsyncRequestResultTest extends TestCase
         ];
 
         $this->cache->setTestData(AsyncResult::CACHE_PREFIX . $taskId, $errorResult);
+        
+        // 确保不会查询数据库
+        $this->resultRepository->expects($this->never())
+            ->method('findOneBy');
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('Custom error message');
