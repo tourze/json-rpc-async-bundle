@@ -62,14 +62,4 @@ class AsyncResult implements \Stringable
     {
         $this->result = $result;
     }
-    
-    /**
-     * 重写 setCreateTime 以支持 DateTimeInterface
-     */
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt instanceof \DateTimeImmutable ? $createdAt : ($createdAt !== null ? \DateTimeImmutable::createFromInterface($createdAt) : null);
-
-        return $this;
-    }
 }
