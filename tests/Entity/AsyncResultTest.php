@@ -43,7 +43,7 @@ class AsyncResultTest extends TestCase
     public function testSetAndGetCreateTime_validDateTime(): void
     {
         $entity = new AsyncResult();
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
 
         $entity->setCreateTime($now);
         $createTime = $entity->getCreateTime();

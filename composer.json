@@ -25,7 +25,6 @@
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/async-contracts": "0.0.*",
     "tourze/doctrine-helper": "0.0.*",
-    "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.1.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",
     "tourze/json-rpc-core": "0.0.*",
