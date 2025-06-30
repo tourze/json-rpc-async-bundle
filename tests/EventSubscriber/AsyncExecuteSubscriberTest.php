@@ -15,36 +15,9 @@ use Tourze\JsonRPC\Core\Model\JsonRpcResponse;
 use Tourze\JsonRPCAsyncBundle\Attribute\AsyncExecute;
 use Tourze\JsonRPCAsyncBundle\EventSubscriber\AsyncExecuteSubscriber;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
+use Tourze\JsonRPCAsyncBundle\Tests\Fixtures\TestServiceWithAsyncExecute;
+use Tourze\JsonRPCAsyncBundle\Tests\Fixtures\TestServiceWithoutAsyncExecute;
 use Tourze\SnowflakeBundle\Service\Snowflake;
-
-// 创建一个带有AsyncExecute属性的测试类
-#[AsyncExecute]
-class TestServiceWithAsyncExecute implements JsonRpcMethodInterface
-{
-    public function execute(): array
-    {
-        return [];
-    }
-
-    public function __invoke(JsonRpcRequest $request): mixed
-    {
-        return $this->execute();
-    }
-}
-
-// 创建一个没有AsyncExecute属性的测试类
-class TestServiceWithoutAsyncExecute implements JsonRpcMethodInterface
-{
-    public function execute(): array
-    {
-        return [];
-    }
-
-    public function __invoke(JsonRpcRequest $request): mixed
-    {
-        return $this->execute();
-    }
-}
 
 class AsyncExecuteSubscriberTest extends TestCase
 {

@@ -13,12 +13,12 @@ use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 
-#[MethodDoc('获取异步任务结果')]
-#[MethodExpose('GetAsyncRequestResult')]
-#[WithMonologChannel('procedure')]
+#[MethodDoc(summary: '获取异步任务结果')]
+#[MethodExpose(method: 'GetAsyncRequestResult')]
+#[WithMonologChannel(channel: 'procedure')]
 class GetAsyncRequestResult extends BaseProcedure
 {
-    #[MethodParam('taskId')]
+    #[MethodParam(description: 'taskId')]
     public string $taskId;
 
     public function __construct(

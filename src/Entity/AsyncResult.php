@@ -4,7 +4,7 @@ namespace Tourze\JsonRPCAsyncBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 use Tourze\ScheduleEntityCleanBundle\Attribute\AsScheduleClean;
@@ -18,14 +18,9 @@ use Tourze\ScheduleEntityCleanBundle\Attribute\AsScheduleClean;
 class AsyncResult implements \Stringable
 {
     use CreateTimeAware;
+    use SnowflakeKeyAware;
     
     public const CACHE_PREFIX = 'async-result-';
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 100, unique: true, options: ['comment' => '任务id'])]
     private string $taskId;
@@ -36,11 +31,6 @@ class AsyncResult implements \Stringable
     public function __toString(): string
     {
         return sprintf('AsyncResult #%s - Task %s', $this->id ?? 'new', $this->taskId ?? 'unknown');
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
     }
 
     public function getTaskId(): string

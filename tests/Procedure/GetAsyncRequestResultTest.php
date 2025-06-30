@@ -14,6 +14,7 @@ use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 
 /**
  * 创建一个自定义的缓存实现来支持 getItem 方法
+ * @internal 测试辅助类，不需要独立的测试
  */
 class TestCacheAdapter implements CacheInterface
 {

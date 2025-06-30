@@ -10,7 +10,6 @@ class AsyncResultTest extends TestCase
     public function testConstruct_defaultValues(): void
     {
         $entity = new AsyncResult();
-        $this->assertNull($entity->getId());
         $this->assertNull($entity->getCreateTime());
         $this->assertNull($entity->getResult());
     }

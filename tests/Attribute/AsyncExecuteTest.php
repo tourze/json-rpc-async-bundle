@@ -5,12 +5,6 @@ namespace Tourze\JsonRPCAsyncBundle\Tests\Attribute;
 use PHPUnit\Framework\TestCase;
 use Tourze\JsonRPCAsyncBundle\Attribute\AsyncExecute;
 
-// 用于测试的类
-#[AsyncExecute]
-class TestClassWithAttribute
-{
-}
-
 class AsyncExecuteTest extends TestCase
 {
     public function testAsyncExecuteAttribute_canBeInstantiated(): void
@@ -21,8 +15,12 @@ class AsyncExecuteTest extends TestCase
 
     public function testAsyncExecuteAttribute_canBeUsedOnClass(): void
     {
+        // 创建一个匿名类用于测试
+        $testClass = new #[AsyncExecute] class {
+        };
+        
         // 获取类的属性
-        $reflection = new \ReflectionClass(TestClassWithAttribute::class);
+        $reflection = new \ReflectionClass($testClass);
         $attributes = $reflection->getAttributes(AsyncExecute::class);
 
         // 验证属性存在
