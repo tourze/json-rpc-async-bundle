@@ -2,12 +2,17 @@
 
 namespace Tourze\JsonRPCAsyncBundle\Tests\Message;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
 
-class AsyncProcedureMessageTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AsyncProcedureMessage::class)]
+final class AsyncProcedureMessageTest extends TestCase
 {
-    public function testSetAndGetTaskId_validValue(): void
+    public function testSetAndGetTaskIdValidValue(): void
     {
         $message = new AsyncProcedureMessage();
         $taskId = 'test-task-id-123';
@@ -16,7 +21,7 @@ class AsyncProcedureMessageTest extends TestCase
         $this->assertSame($taskId, $message->getTaskId());
     }
 
-    public function testSetAndGetPayload_validValue(): void
+    public function testSetAndGetPayloadValidValue(): void
     {
         $message = new AsyncProcedureMessage();
         $payload = '{"jsonrpc":"2.0","method":"test","params":{},"id":"1"}';

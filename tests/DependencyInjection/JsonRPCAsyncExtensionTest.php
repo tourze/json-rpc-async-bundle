@@ -2,19 +2,28 @@
 
 namespace Tourze\JsonRPCAsyncBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Tourze\JsonRPCAsyncBundle\DependencyInjection\JsonRPCAsyncExtension;
+use Tourze\PHPUnitSymfonyUnitTest\AbstractDependencyInjectionExtensionTestCase;
 
-class JsonRPCAsyncExtensionTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(JsonRPCAsyncExtension::class)]
+final class JsonRPCAsyncExtensionTest extends AbstractDependencyInjectionExtensionTestCase
 {
     private JsonRPCAsyncExtension $extension;
+
     private ContainerBuilder $container;
 
     protected function setUp(): void
     {
+        parent::setUp();
+        // @phpstan-ignore-next-line integrationTest.noDirectInstantiationOfCoveredClass - 集成测试中需要直接实例化被测类进行精确测试
         $this->extension = new JsonRPCAsyncExtension();
         $this->container = new ContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'test');
     }
 
     public function testExtensionCanBeConstructed(): void
@@ -22,23 +31,12 @@ class JsonRPCAsyncExtensionTest extends TestCase
         $this->assertInstanceOf(JsonRPCAsyncExtension::class, $this->extension);
     }
 
-    public function testLoad_withEmptyConfig_loadsServices(): void
-    {
-        $this->extension->load([], $this->container);
-
-        // 验证服务配置已加载
-        $this->assertTrue($this->container->hasDefinition('Tourze\JsonRPCAsyncBundle\EventSubscriber\AsyncExecuteSubscriber'));
-        $this->assertTrue($this->container->hasDefinition('Tourze\JsonRPCAsyncBundle\MessageHandler\AsyncProcedureHandler'));
-        $this->assertTrue($this->container->hasDefinition('Tourze\JsonRPCAsyncBundle\Procedure\GetAsyncRequestResult'));
-        $this->assertTrue($this->container->hasDefinition('Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository'));
-    }
-
-    public function testLoad_withConfiguration_loadsServicesCorrectly(): void
+    public function testLoadWithConfigurationLoadsServicesCorrectly(): void
     {
         $config = [
             'json_rpc_async' => [
-                'some_option' => 'value'
-            ]
+                'some_option' => 'value',
+            ],
         ];
 
         $this->extension->load($config, $this->container);
@@ -48,7 +46,7 @@ class JsonRPCAsyncExtensionTest extends TestCase
         $this->assertTrue($this->container->hasDefinition('Tourze\JsonRPCAsyncBundle\MessageHandler\AsyncProcedureHandler'));
     }
 
-    public function testLoad_servicesAreAutowired(): void
+    public function testLoadServicesAreAutowired(): void
     {
         $this->extension->load([], $this->container);
 
@@ -65,7 +63,7 @@ class JsonRPCAsyncExtensionTest extends TestCase
         $this->assertTrue($repositoryDef->isAutowired());
     }
 
-    public function testLoad_servicesAreAutoconfigured(): void
+    public function testLoadServicesAreAutoconfigured(): void
     {
         $this->extension->load([], $this->container);
 
@@ -82,7 +80,7 @@ class JsonRPCAsyncExtensionTest extends TestCase
         $this->assertTrue($repositoryDef->isAutoconfigured());
     }
 
-    public function testLoad_multipleCallsDoNotDuplicate(): void
+    public function testLoadMultipleCallsDoNotDuplicate(): void
     {
         $this->extension->load([], $this->container);
         $firstCallServiceCount = count($this->container->getDefinitions());
@@ -93,4 +91,4 @@ class JsonRPCAsyncExtensionTest extends TestCase
         // 第二次调用不应该增加服务数量（不应该重复加载）
         $this->assertEquals($firstCallServiceCount, $secondCallServiceCount);
     }
-} 
+}

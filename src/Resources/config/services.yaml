@@ -4,6 +4,10 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+  # Alias SimpleCache to Cache adapter for compatibility
+  Psr\SimpleCache\CacheInterface:
+    alias: 'cache.app'
+
   Tourze\JsonRPCAsyncBundle\EventSubscriber\:
     resource: '../../EventSubscriber/'
   Tourze\JsonRPCAsyncBundle\MessageHandler\:

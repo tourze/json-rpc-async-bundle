@@ -3,27 +3,29 @@
 namespace Tourze\JsonRPCAsyncBundle\MessageHandler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Tourze\JsonRPC\Core\Contracts\EndpointInterface;
-use Tourze\JsonRPC\Core\Exception\JsonRpcException;
+use Tourze\JsonRPC\Core\Exception\JsonRpcInternalErrorException;
 use Tourze\JsonRPC\Core\Model\JsonRpcResponse;
+use Tourze\JsonRPC\Core\Serialization\JsonRpcResponseNormalizer;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
-use Tourze\JsonRPCEndpointBundle\Serialization\JsonRpcResponseNormalizer;
 
 #[AsMessageHandler]
-class AsyncProcedureHandler
+#[WithMonologChannel(channel: 'json_rpc_async')]
+readonly class AsyncProcedureHandler
 {
     public function __construct(
-        private readonly EndpointInterface $sdkEndpoint,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly CacheInterface $cache,
-        private readonly LoggerInterface $logger,
-        private readonly JsonRpcResponseNormalizer $responseNormalizer,
-        private readonly AsyncResultRepository $resultRepository,
+        private EndpointInterface $sdkEndpoint,
+        private EntityManagerInterface $entityManager,
+        private CacheInterface $cache,
+        private LoggerInterface $logger,
+        private JsonRpcResponseNormalizer $responseNormalizer,
+        private AsyncResultRepository $resultRepository,
     ) {
     }
 
@@ -33,11 +35,12 @@ class AsyncProcedureHandler
         $record = $this->resultRepository->findOneBy([
             'taskId' => $message->getTaskId(),
         ]);
-        if ($record !== null) {
+        if (null !== $record) {
             $this->logger->warning('异步JSON-RPC任务已执行过，不允许重复执行', [
                 'taskId' => $message->getTaskId(),
                 'payload' => $message->getPayload(),
             ]);
+
             return;
         }
 
@@ -55,7 +58,7 @@ class AsyncProcedureHandler
 
             $j = new JsonRpcResponse();
             $j->setId($message->getTaskId());
-            $j->setError(new JsonRpcException(-1, $exception->getMessage(), previous: $exception));
+            $j->setError(new JsonRpcInternalErrorException($exception));
             $response = $this->responseNormalizer->normalize($j);
         }
 

@@ -4,6 +4,7 @@ namespace Tourze\JsonRPCAsyncBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
@@ -19,12 +20,18 @@ class AsyncResult implements \Stringable
 {
     use CreateTimeAware;
     use SnowflakeKeyAware;
-    
+
     public const CACHE_PREFIX = 'async-result-';
 
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
     #[ORM\Column(type: Types::STRING, length: 100, unique: true, options: ['comment' => '任务id'])]
     private string $taskId;
 
+    /**
+     * @var array<string, mixed>|null
+     */
+    #[Assert\Valid]
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '响应内容'])]
     private ?array $result = null;
 
@@ -43,11 +50,17 @@ class AsyncResult implements \Stringable
         $this->taskId = $taskId;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getResult(): ?array
     {
         return $this->result;
     }
 
+    /**
+     * @param array<string, mixed>|null $result
+     */
     public function setResult(?array $result): void
     {
         $this->result = $result;

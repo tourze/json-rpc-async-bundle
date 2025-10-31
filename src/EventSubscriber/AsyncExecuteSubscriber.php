@@ -2,6 +2,7 @@
 
 namespace Tourze\JsonRPCAsyncBundle\EventSubscriber;
 
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Tourze\DoctrineHelper\ReflectionHelper;
@@ -11,6 +12,7 @@ use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
 use Tourze\JsonRPC\Core\Model\JsonRpcResponse;
 use Tourze\JsonRPCAsyncBundle\Attribute\AsyncExecute;
+use Tourze\JsonRPCAsyncBundle\Exception\JsonEncodingException;
 use Tourze\JsonRPCAsyncBundle\Message\AsyncProcedureMessage;
 use Tourze\SnowflakeBundle\Service\Snowflake;
 
@@ -18,6 +20,7 @@ use Tourze\SnowflakeBundle\Service\Snowflake;
  * 异步执行逻辑的处理
  * 要注意这个需要前端配合才能真正使用
  */
+#[Autoconfigure(public: true)]
 class AsyncExecuteSubscriber
 {
     public const ASYNC_PREFIX = 'async_';
@@ -40,12 +43,18 @@ class AsyncExecuteSubscriber
 
         $message = new AsyncProcedureMessage();
         $message->setTaskId($taskId);
-        $message->setPayload(json_encode([
+        $payload = json_encode([
             'jsonrpc' => $event->getItem()->getJsonrpc(),
             'id' => "sync_{$taskId}",
             'method' => $event->getItem()->getMethod(),
-            'params' => $event->getItem()->getParams()->toArray(),
-        ]));
+            'params' => $event->getItem()->getParams()?->toArray() ?? null,
+        ]);
+
+        if (false === $payload) {
+            throw new JsonEncodingException('Failed to encode JSON payload');
+        }
+
+        $message->setPayload($payload);
         $this->messageBus->dispatch($message);
 
         // 补充一个返回结果
@@ -70,15 +79,17 @@ class AsyncExecuteSubscriber
         }
 
         // 没ID，不处理
-        if (empty($request->getId())) {
+        if (null === $request->getId() || '' === $request->getId()) {
             return false;
         }
+        $requestId = $request->getId();
+
         // 直接声明为同步的话，我们不处理
-        if (str_starts_with($request->getId(), 'sync_')) {
+        if (str_starts_with((string) $requestId, 'sync_')) {
             return false;
         }
         // 异步的处理
-        if (str_starts_with($request->getId(), static::ASYNC_PREFIX)) {
+        if (str_starts_with((string) $requestId, self::ASYNC_PREFIX)) {
             return true;
         }
         // 强制声明的
@@ -88,7 +99,7 @@ class AsyncExecuteSubscriber
         try {
             $service = $this->requestHandler->resolveMethod($request);
 
-            return ReflectionHelper::hasClassAttributes(ReflectionHelper::getClassReflection($service), AsyncExecute::class);
+            return ReflectionHelper::hasClassAttributes(new \ReflectionClass($service), AsyncExecute::class);
         } catch (\Throwable $exception) {
         }
 

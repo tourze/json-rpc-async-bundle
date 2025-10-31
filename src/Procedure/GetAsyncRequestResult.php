@@ -4,10 +4,11 @@ namespace Tourze\JsonRPCAsyncBundle\Procedure;
 
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\Cache\CacheInterface;
+use Psr\SimpleCache\CacheInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
+use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use Tourze\JsonRPCAsyncBundle\Entity\AsyncResult;
@@ -15,7 +16,8 @@ use Tourze\JsonRPCAsyncBundle\Repository\AsyncResultRepository;
 
 #[MethodDoc(summary: '获取异步任务结果')]
 #[MethodExpose(method: 'GetAsyncRequestResult')]
-#[WithMonologChannel(channel: 'procedure')]
+#[MethodTag(name: '异步任务')]
+#[WithMonologChannel(channel: 'json_rpc_async')]
 class GetAsyncRequestResult extends BaseProcedure
 {
     #[MethodParam(description: 'taskId')]
@@ -31,24 +33,22 @@ class GetAsyncRequestResult extends BaseProcedure
     public function execute(): array
     {
         $cacheKey = AsyncResult::CACHE_PREFIX . $this->taskId;
-        
+
         $cachedResult = null;
         try {
-            $cachedResult = $this->cache->get($cacheKey, function () {
-                return null;
-            });
+            $cachedResult = $this->cache->get($cacheKey);
         } catch (\Throwable $exception) {
             $this->logger->error('从缓存中读取异步结果失败', [
                 'exception' => $exception,
             ]);
         }
-        
-        if ($cachedResult !== null) {
+
+        if (null !== $cachedResult) {
             return $this->handleResult($cachedResult);
         }
 
         $record = $this->resultRepository->findOneBy(['taskId' => $this->taskId]);
-        if ($record === null) {
+        if (null === $record) {
             throw new ApiException('未执行完成', -789);
         }
 
@@ -57,12 +57,20 @@ class GetAsyncRequestResult extends BaseProcedure
         return $this->handleResult($result);
     }
 
-    private function handleResult($result): array
+    /**
+     * @param array<string, mixed>|null $result
+     * @return array<string, mixed>
+     */
+    private function handleResult(?array $result): array
     {
+        if (null === $result) {
+            return [];
+        }
+
         if (isset($result['error'])) {
             throw new ApiException($result['error']['message'], $result['error']['code']);
         }
 
-        return (array) $result['result'];
+        return (array) ($result['result'] ?? []);
     }
 }
