@@ -32,7 +32,7 @@
     "tourze/doctrine-timestamp-bundle": "1.0.*",
     "tourze/json-rpc-core": "1.0.*",
     "tourze/json-rpc-endpoint-bundle": "0.1.*",
-    "tourze/symfony-dependency-service-loader": "1.*",
+    "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-schedule-entity-clean-bundle": "1.0.*",
     "tourze/symfony-snowflake-bundle": "1.0.*"
   },
