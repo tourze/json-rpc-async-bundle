@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Tourze\BundleDependency\BundleDependencyInterface;
 use Tourze\DoctrineSnowflakeBundle\DoctrineSnowflakeBundle;
 use Tourze\DoctrineTimestampBundle\DoctrineTimestampBundle;
+use Tourze\JsonRPCEndpointBundle\JsonRPCEndpointBundle;
 use Tourze\ScheduleEntityCleanBundle\ScheduleEntityCleanBundle;
 
 class JsonRPCAsyncBundle extends Bundle implements BundleDependencyInterface
@@ -18,6 +19,7 @@ class JsonRPCAsyncBundle extends Bundle implements BundleDependencyInterface
             DoctrineSnowflakeBundle::class => ['all' => true],
             DoctrineTimestampBundle::class => ['all' => true],
             ScheduleEntityCleanBundle::class => ['all' => true],
+            JsonRPCEndpointBundle::class => ['all' => true],
         ];
     }
 }
